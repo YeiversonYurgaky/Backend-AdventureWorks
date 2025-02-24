@@ -1,0 +1,193 @@
+import sql from "msnodesqlv8";
+import { connectionString } from "../config/db.js";
+
+export const getAllProductsRepository = async () => {
+  return new Promise((resolve, reject) => {
+    const query = "SELECT * FROM SalesLT.Products";
+
+    sql.query(connectionString, query, (err, rows) => {
+      if (err) {
+        console.error("❌ Error al obtener productos:", err);
+        return reject(
+          new Error("Error al obtener productos de la base de datos")
+        );
+      }
+      resolve(rows);
+    });
+  });
+};
+
+export const getProductByIdRepository = async (id) => {
+  return new Promise((resolve, reject) => {
+    const query = "SELECT * FROM SalesLT.Product WHERE ProductID = ?";
+
+    sql.query(connectionString, query, [id], (err, rows) => {
+      if (err) {
+        console.error("❌ Error al obtener producto:", err);
+        return reject(
+          new Error("Error al obtener producto de la base de datos")
+        );
+      }
+
+      resolve(rows.length > 0 ? rows[0] : null);
+    });
+  });
+};
+
+export const createProductRepository = async (
+  Name,
+  ProductNumber,
+  Color,
+  StandardCost,
+  ListPrice,
+  Size,
+  Weight,
+  ProductCategoryID,
+  ProductModelID,
+  SellStartDate
+) => {
+  return new Promise((resolve, reject) => {
+    const checkQuery =
+      "SELECT COUNT(*) AS count FROM SalesLT.Product WHERE Name = ?";
+
+    sql.query(connectionString, checkQuery, [Name], (err, result) => {
+      if (err) {
+        console.error("❌ Error en la consulta de verificación:", err);
+        return reject(
+          new Error("Error al verificar la existencia del producto")
+        );
+      }
+
+      if (result[0].count > 0) {
+        return reject(new Error(`El producto con Name: '${Name}' ya existe`));
+      }
+
+      const insertQuery = `INSERT INTO SalesLT.Product 
+        (Name, ProductNumber, Color, StandardCost, ListPrice, Size, Weight, ProductCategoryID, ProductModelID, SellStartDate) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+      sql.query(
+        connectionString,
+        insertQuery,
+        [
+          Name,
+          ProductNumber,
+          Color,
+          StandardCost,
+          ListPrice,
+          Size,
+          Weight,
+          ProductCategoryID,
+          ProductModelID,
+          SellStartDate,
+        ],
+        (err, result) => {
+          if (err) {
+            console.error("❌ Error al insertar producto:", err);
+            return reject(
+              new Error("Error al insertar el producto en la base de datos")
+            );
+          }
+
+          resolve({ message: "Producto creado correctamente", result });
+        }
+      );
+    });
+  });
+};
+
+export const updateProductRepository = async (
+  id,
+  Name,
+  ProductNumber,
+  Color,
+  StandardCost,
+  ListPrice,
+  Size,
+  Weight,
+  ProductCategoryID,
+  ProductModelID
+) => {
+  return new Promise((resolve, reject) => {
+    // Primero verificamos si el producto existe
+    const checkQuery = `SELECT COUNT(*) AS count FROM SalesLT.Product WHERE ProductID = ?`;
+
+    sql.query(connectionString, checkQuery, [id], (checkErr, checkResult) => {
+      if (checkErr) {
+        console.error("❌ Error al verificar producto:", checkErr);
+        return reject(new Error("Error al verificar si el producto existe"));
+      }
+
+      // Verificar si el producto existe
+      const exists = checkResult && checkResult[0] && checkResult[0].count > 0;
+
+      if (!exists) {
+        console.error(
+          `❌ El producto con ID ${id} no existe en la base de datos`
+        );
+        return reject(new Error("El producto no existe en la base de datos"));
+      }
+
+      // Si el producto existe, proceder con la actualización
+      const updateQuery = `
+        UPDATE SalesLT.Product
+        SET Name = ?, 
+            ProductNumber = ?, 
+            Color = ?, 
+            StandardCost = ?,
+            ListPrice = ?, 
+            Size = ?, 
+            Weight = ?, 
+            ProductCategoryID = ?, 
+            ProductModelID = ?
+        WHERE ProductID = ?`;
+
+      const values = [
+        Name,
+        ProductNumber,
+        Color,
+        StandardCost,
+        ListPrice,
+        Size,
+        Weight,
+        ProductCategoryID,
+        ProductModelID,
+        id,
+      ];
+
+      sql.query(connectionString, updateQuery, values, (updateErr) => {
+        if (updateErr) {
+          console.error("❌ Error al actualizar producto:", updateErr);
+          return reject(
+            new Error("Error al actualizar el producto en la base de datos")
+          );
+        }
+
+        // Si no hay error, asumimos que la actualización fue exitosa
+        resolve({
+          message: "Producto actualizado correctamente",
+          productId: id,
+        });
+      });
+    });
+  });
+};
+
+export const deleteProductRepository = async (id) => {
+  return new Promise((resolve, reject) => {
+    const deleteQuery = `DELETE FROM SalesLT.Product WHERE ProductID = ?`;
+
+    sql.query(connectionString, deleteQuery, [id], (err, result) => {
+      if (err) {
+        console.error("❌ Error al eliminar producto:", err);
+        return reject(new Error("Error al eliminar el producto"));
+      }
+
+      if (result.rowsAffected === 0) {
+        return reject(new Error("El producto no existe o ya fue eliminado"));
+      }
+
+      resolve({ message: "Producto eliminado correctamente" });
+    });
+  });
+};
