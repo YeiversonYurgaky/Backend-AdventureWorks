@@ -2,7 +2,9 @@ import {
   createProductRepository,
   deleteProductRepository,
   getAllProductsRepository,
+  getCategories,
   getProductByIdRepository,
+  getProducts,
   updateProductRepository,
 } from "../repository/products.repository.js";
 import { Response } from "../utils/response.js";
@@ -21,6 +23,58 @@ const getAllProductsController = async (req, res) => {
   } catch (error) {
     responseObj.status = 500;
     responseObj.message = "Error al obtener productos";
+    responseObj.result = error.message || "Error desconocido";
+
+    res.status(500).json(responseObj);
+  }
+};
+
+export const getAllProducts = async (req, res) => {
+  let responseObj = { ...Response };
+  try {
+    // Obtener parámetros de consulta con valores predeterminados
+    const sortBy = req.query.sortBy || "name"; // ordenamiento predeterminado por nombre
+    const sortDirection = req.query.sortDirection || "asc";
+    const categoryId = req.query.categoryId;
+    const searchTerm = req.query.searchTerm || "";
+
+    // Llamar al repository con los parámetros actualizados
+    const products = await getProducts(
+      sortBy,
+      sortDirection,
+      categoryId,
+      searchTerm
+    );
+
+    responseObj.status = 200;
+    responseObj.message = "Productos obtenidos correctamente";
+    responseObj.result = products;
+
+    res.status(200).json(responseObj);
+  } catch (error) {
+    console.error("Error al obtener productos:", error);
+    responseObj.status = 500;
+    responseObj.message = "Error al obtener productos";
+    responseObj.result = error.message || "Error desconocido";
+
+    res.status(500).json(responseObj);
+  }
+};
+
+export const getAllCategories = async (req, res) => {
+  let responseObj = { ...Response };
+  try {
+    const categories = await getCategories();
+
+    responseObj.status = 200;
+    responseObj.message = "Categorías obtenidas correctamente";
+    responseObj.result = categories;
+
+    res.status(200).json(responseObj);
+  } catch (error) {
+    console.error("Error en productController.getAllCategories:", error);
+    responseObj.status = 500;
+    responseObj.message = "Error al obtener categorías";
     responseObj.result = error.message || "Error desconocido";
 
     res.status(500).json(responseObj);
@@ -203,6 +257,8 @@ const deleteProductController = async (req, res) => {
 
 export default {
   getAllProductsController,
+  getAllProducts,
+  getAllCategories,
   getProductByIdController,
   createProductController,
   updateProductController,

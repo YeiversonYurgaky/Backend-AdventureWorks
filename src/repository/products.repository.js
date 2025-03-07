@@ -1,9 +1,9 @@
 import sql from "msnodesqlv8";
-import { connectionString } from "../config/db.js";
+import { connectionString, queryDatabase } from "../config/db.js";
 
 export const getAllProductsRepository = async () => {
   return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM SalesLT.Products";
+    const query = "SELECT * FROM SalesLT.Product";
 
     sql.query(connectionString, query, (err, rows) => {
       if (err) {
@@ -15,6 +15,63 @@ export const getAllProductsRepository = async () => {
       resolve(rows);
     });
   });
+};
+
+export const getProducts = async (
+  sortBy = "name",
+  sortDirection = "asc",
+  categoryId = null,
+  searchTerm = ""
+) => {
+  let query = `SELECT * FROM SalesLT.Product WHERE 1=1`;
+
+  const params = [];
+
+  // Filtro de búsqueda por nombre
+  if (searchTerm) {
+    query += ` AND Name LIKE ?`;
+    params.push(`%${searchTerm}%`);
+  }
+
+  // Filtro por categoría
+  if (categoryId) {
+    query += ` AND ProductCategoryID = ?`;
+    params.push(categoryId);
+  }
+
+  // Ordenamiento
+  const direction = sortDirection.toUpperCase() === "DESC" ? "DESC" : "ASC";
+
+  switch (sortBy.toLowerCase()) {
+    case "listprice":
+      query += ` ORDER BY ListPrice ${direction}`;
+      break;
+    case "standardcost":
+      query += ` ORDER BY StandardCost ${direction}`;
+      break;
+    case "name":
+    default:
+      query += ` ORDER BY Name ${direction}`;
+      break;
+  }
+
+  try {
+    return await queryDatabase(query, params);
+  } catch (error) {
+    console.error("Error en productRepository.getProducts:", error);
+    throw error;
+  }
+};
+
+export const getCategories = async () => {
+  const query = `SELECT ProductCategoryID, Name FROM SalesLT.ProductCategory`;
+
+  try {
+    return await queryDatabase(query);
+  } catch (error) {
+    console.error("Error en productRepository.getCategories:", error);
+    throw error;
+  }
 };
 
 export const getProductByIdRepository = async (id) => {
