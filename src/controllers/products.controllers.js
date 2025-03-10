@@ -2,9 +2,9 @@ import {
   createProductRepository,
   deleteProductRepository,
   getAllProductsRepository,
-  getCategories,
+  getCategoriesRepository,
   getProductByIdRepository,
-  getProducts,
+  getProductsRepository,
   updateProductRepository,
 } from "../repository/products.repository.js";
 import { Response } from "../utils/response.js";
@@ -39,7 +39,7 @@ export const getAllProducts = async (req, res) => {
     const searchTerm = req.query.searchTerm || "";
 
     // Llamar al repository con los parámetros actualizados
-    const products = await getProducts(
+    const products = await getProductsRepository(
       sortBy,
       sortDirection,
       categoryId,
@@ -64,7 +64,7 @@ export const getAllProducts = async (req, res) => {
 export const getAllCategories = async (req, res) => {
   let responseObj = { ...Response };
   try {
-    const categories = await getCategories();
+    const categories = await getCategoriesRepository();
 
     responseObj.status = 200;
     responseObj.message = "Categorías obtenidas correctamente";
