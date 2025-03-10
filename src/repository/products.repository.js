@@ -1,23 +1,7 @@
 import sql from "msnodesqlv8";
 import { connectionString, queryDatabase } from "../config/db.js";
 
-export const getAllProductsRepository = async () => {
-  return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM SalesLT.Product";
-
-    sql.query(connectionString, query, (err, rows) => {
-      if (err) {
-        console.error("❌ Error al obtener productos:", err);
-        return reject(
-          new Error("Error al obtener productos de la base de datos")
-        );
-      }
-      resolve(rows);
-    });
-  });
-};
-
-export const getProducts = async (
+export const getProductsRepository = async (
   sortBy = "name",
   sortDirection = "asc",
   categoryId = null,
@@ -63,7 +47,7 @@ export const getProducts = async (
   }
 };
 
-export const getCategories = async () => {
+export const getCategoriesRepository = async () => {
   const query = `SELECT ProductCategoryID, Name FROM SalesLT.ProductCategory`;
 
   try {
@@ -72,23 +56,6 @@ export const getCategories = async () => {
     console.error("Error en productRepository.getCategories:", error);
     throw error;
   }
-};
-
-export const getProductByIdRepository = async (id) => {
-  return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM SalesLT.Product WHERE ProductID = ?";
-
-    sql.query(connectionString, query, [id], (err, rows) => {
-      if (err) {
-        console.error("❌ Error al obtener producto:", err);
-        return reject(
-          new Error("Error al obtener producto de la base de datos")
-        );
-      }
-
-      resolve(rows.length > 0 ? rows[0] : null);
-    });
-  });
 };
 
 export const createProductRepository = async (
