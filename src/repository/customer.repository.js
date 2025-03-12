@@ -17,6 +17,35 @@ export const getAllCustomersRepository = async () => {
   });
 };
 
+export const getCustomers = async (
+  sortBy = "name",
+  sortDirection = "asc",
+  searchTerm = ""
+) => {
+  let query = `SELECT * FROM SalesLT.Customer WHERE 1=1`;
+
+  const params = [];
+
+  // Filtro de búsqueda por nombre o apellido
+  if (searchTerm) {
+    query += ` AND (FirstName LIKE ? OR LastName LIKE ?)`;
+    params.push(`%${searchTerm}%`, `%${searchTerm}%`); // Agregar el parámetro de búsqueda para ambos campos
+  }
+
+  // Agregar ordenamiento
+  query += ` ORDER BY ${sortBy} ${sortDirection.toUpperCase()}`;
+
+  return new Promise((resolve, reject) => {
+    sql.query(connectionString, query, params, (err, rows) => {
+      if (err) {
+        console.error("❌ Error al obtener clientes:", err);
+        return reject(new Error("Error al obtener clientes de la base de datos"));
+      }
+      resolve(rows);
+    });
+  });
+};
+
 export const getCustomerByIdRepository = async (id) => {
   return new Promise((resolve, reject) => {
     const query = "SELECT * FROM SalesLT.Customer WHERE CustomerID = ?";
