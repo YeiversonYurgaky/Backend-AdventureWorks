@@ -3,33 +3,11 @@ import {
   deleteProductRepository,
   getAllProductsRepository,
   getCategoriesRepository,
-  getProductByIdRepository,
-  getProductsRepository,
   updateProductRepository,
 } from "../repository/products.repository.js";
 import { Response } from "../utils/response.js";
 
-const getAllProductsController = async (req, res) => {
-  let responseObj = { ...Response };
-
-  try {
-    const products = await getAllProductsRepository();
-
-    responseObj.status = 200;
-    responseObj.message = "Productos obtenidos correctamente";
-    responseObj.result = products;
-
-    res.status(200).json(responseObj);
-  } catch (error) {
-    responseObj.status = 500;
-    responseObj.message = "Error al obtener productos";
-    responseObj.result = error.message || "Error desconocido";
-
-    res.status(500).json(responseObj);
-  }
-};
-
-export const getAllProducts = async (req, res) => {
+export const getAllProductsController = async (req, res) => {
   let responseObj = { ...Response };
   try {
     // Obtener parámetros de consulta con valores predeterminados
@@ -39,7 +17,7 @@ export const getAllProducts = async (req, res) => {
     const searchTerm = req.query.searchTerm || "";
 
     // Llamar al repository con los parámetros actualizados
-    const products = await getProductsRepository(
+    const products = await getAllProductsRepository(
       sortBy,
       sortDirection,
       categoryId,
@@ -61,7 +39,7 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
-export const getAllCategories = async (req, res) => {
+export const getAllCategoriesController = async (req, res) => {
   let responseObj = { ...Response };
   try {
     const categories = await getCategoriesRepository();
@@ -75,43 +53,6 @@ export const getAllCategories = async (req, res) => {
     console.error("Error en productController.getAllCategories:", error);
     responseObj.status = 500;
     responseObj.message = "Error al obtener categorías";
-    responseObj.result = error.message || "Error desconocido";
-
-    res.status(500).json(responseObj);
-  }
-};
-
-const getProductByIdController = async (req, res) => {
-  let responseObj = { ...Response };
-  const productId = parseInt(req.params.id, 10);
-
-  if (isNaN(productId)) {
-    responseObj.status = 400;
-    responseObj.message = "ID de producto inválido";
-    responseObj.result = null;
-
-    return res.status(400).json(responseObj);
-  }
-
-  try {
-    const product = await getProductByIdRepository(productId);
-
-    if (!product) {
-      responseObj.status = 404;
-      responseObj.message = "Producto no encontrado";
-      responseObj.result = null;
-
-      return res.status(404).json(responseObj);
-    }
-
-    responseObj.status = 200;
-    responseObj.message = "Producto obtenido correctamente";
-    responseObj.result = product;
-
-    res.status(200).json(responseObj);
-  } catch (error) {
-    responseObj.status = 500;
-    responseObj.message = "Error al obtener producto";
     responseObj.result = error.message || "Error desconocido";
 
     res.status(500).json(responseObj);
@@ -257,9 +198,7 @@ const deleteProductController = async (req, res) => {
 
 export default {
   getAllProductsController,
-  getAllProducts,
-  getAllCategories,
-  getProductByIdController,
+  getAllCategoriesController,
   createProductController,
   updateProductController,
   deleteProductController,

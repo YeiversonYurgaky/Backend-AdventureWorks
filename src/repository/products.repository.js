@@ -1,7 +1,7 @@
 import sql from "msnodesqlv8";
 import { connectionString, queryDatabase } from "../config/db.js";
 
-export const getProductsRepository = async (
+export const getAllProductsRepository = async (
   sortBy = "name",
   sortDirection = "asc",
   categoryId = null,
