@@ -3,12 +3,10 @@ import productController from "../controllers/products.controllers.js";
 
 const api = express.Router();
 
-//api.get("/products", productController.getAllProductsController);
-// api.get("/products/:id", productController.getProductByIdController);
+api.get("/products", productController.getAllProductsController);
 api.post("/products", productController.createProductController);
 api.put("/products/:id", productController.updateProductController);
 api.delete("/products/:id", productController.deleteProductController);
-api.get("/products/categories", productController.getAllCategories);
-api.get("/products", productController.getAllProducts);
+api.get("/products/categories", productController.getAllCategoriesController);
 
 export default api;
