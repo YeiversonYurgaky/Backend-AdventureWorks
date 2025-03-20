@@ -1,24 +1,8 @@
 import sql from "msnodesqlv8";
 import { connectionString, queryDatabase } from "../config/db.js";
 
-export const getAllCustomersRepository = async () => {
-  return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM SalesLT.Customer";
-
-    sql.query(connectionString, query, (err, rows) => {
-      if (err) {
-        console.error("❌ Error al obtener clientes:", err);
-        return reject(
-          new Error("Error al obtener clientes de la base de datos")
-        );
-      }
-      resolve(rows);
-    });
-  });
-};
-
-export const getCustomers = async (
-  sortBy = "name",
+export const getAllCustomersRepository = async (
+  sortBy = "FirstName",
   sortDirection = "asc",
   searchTerm = ""
 ) => {
