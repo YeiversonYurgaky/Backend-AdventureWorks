@@ -2,71 +2,60 @@ import {
     createCustomerRepository,
     deleteCustomerRepository,
     getAllCustomersRepository,
-    getCustomerByIdRepository,
     updateCustomerRepository,
   } from "../repository/customer.repository.js";
   import { Response } from "../utils/response.js";
   
-  const getAllCustomersController = async (req, res) => {
-    let responseObj = { ...Response };
+  // const getAllCustomersController = async (req, res) => {
+  //   let responseObj = { ...Response };
   
-    try {
-      const customers = await getAllCustomersRepository();
+  //   try {
+  //     const customers = await getAllCustomersRepository();
   
-      responseObj.status = 200;
-      responseObj.message = "Clientes obtenidos correctamente";
-      responseObj.result = customers;
+  //     responseObj.status = 200;
+  //     responseObj.message = "Clientes obtenidos correctamente";
+  //     responseObj.result = customers;
   
-      res.status(200).json(responseObj);
-    } catch (error) {
-      responseObj.status = 500;
-      responseObj.message = "Error al obtener clientes";
-      responseObj.result = error.message || "Error desconocido";
+  //     res.status(200).json(responseObj);
+  //   } catch (error) {
+  //     responseObj.status = 500;
+  //     responseObj.message = "Error al obtener clientes";
+  //     responseObj.result = error.message || "Error desconocido";
   
-      res.status(500).json(responseObj);
-    }
-  };
-  
-  const getCustomerByIdController = async (req, res) => {
-    let responseObj = { ...Response };
-    const customerId = parseInt(req.params.id, 10);
-  
-    if (isNaN(customerId)) {
-      responseObj.status = 400;
-      responseObj.message = "ID de cliente inválido";
-      responseObj.result = null;
-  
-      return res.status(400).json(responseObj);
-    }
-  
-    try {
-      const customer = await getCustomerByIdRepository(customerId);
-  
-      if (!customer) {
-        responseObj.status = 404;
-        responseObj.message = "Cliente no encontrado";
-        responseObj.result = null;
-  
-        return res.status(404).json(responseObj);
-      }
-  
-      responseObj.status = 200;
-      responseObj.message = "Cliente obtenido correctamente";
-      responseObj.result = customer;
-  
-      res.status(200).json(responseObj);
-    } catch (error) {
-      responseObj.status = 500;
-      responseObj.message = "Error al obtener cliente";
-      responseObj.result = error.message || "Error desconocido";
-  
-      res.status(500).json(responseObj);
-    }
-  };
-  
-  const createCustomerController = async (req, res) => {
-    let responseObj = { ...Response };
-    const {
+  //     res.status(500).json(responseObj);
+  //   }
+  // };
+
+const createCustomerController = async (req, res) => {
+  let responseObj = { ...Response };
+
+  // Extraer los datos del cuerpo de la solicitud
+  const {
+    NameStyle,
+    Title,
+    FirstName,
+    MiddleName,
+    LastName,
+    Suffix,
+    CompanyName,
+    SalesPerson,
+    EmailAddress,
+    Phone,
+    PasswordHash,
+    PasswordSalt,
+  } = req.body;
+
+  // Validar que los campos obligatorios estén presentes
+  if (!FirstName || !LastName || !EmailAddress) {
+    responseObj.status = 400;
+    responseObj.message = "Faltan datos requeridos";
+    responseObj.result = "Campos obligatorios: FirstName, LastName, EmailAddress";
+    return res.status(400).json(responseObj);
+  }
+
+  try {
+    // Llamar al repositorio para crear el cliente
+    const newCustomer = await createCustomerRepository(
       NameStyle,
       Title,
       FirstName,
@@ -78,41 +67,42 @@ import {
       EmailAddress,
       Phone,
       PasswordHash,
-      PasswordSalt,
-    } = req.body;
+      PasswordSalt
+    );
+
+    // Responder con éxito
+    responseObj.status = 201;
+    responseObj.message = "Cliente creado correctamente";
+    responseObj.result = newCustomer;
+    res.status(201).json(responseObj);
+  } catch (error) {
+    // Manejar errores
+    console.error("Error al crear cliente:", error);
+    responseObj.status = 500;
+    responseObj.message = "Error al crear cliente";
+    responseObj.result = error.message || "Error desconocido";
+    res.status(500).json(responseObj);
+  }
+};
   
-    if (!FirstName || !LastName || !EmailAddress) {
-      responseObj.status = 400;
-      responseObj.message = "Faltan datos requeridos";
-      responseObj.result = "Campos obligatorios: FirstName, LastName, EmailAddress";
-      return res.status(400).json(responseObj);
-    }
-  
+  const getCustomers = async (req, res) => {
     try {
-      const newCustomer = await createCustomerRepository(
-        NameStyle,
-        Title,
-        FirstName,
-        MiddleName,
-        LastName,
-        Suffix,
-        CompanyName,
-        SalesPerson,
-        EmailAddress,
-        Phone,
-        PasswordHash,
-        PasswordSalt
-      );
+      const sortBy = req.query.sortBy || "FirstName";
+      const sortDirection = req.query.sortDirection || "asc";
+      const searchTerm = req.query.searchTerm || "";
   
-      responseObj.status = 201;
-      responseObj.message = "Cliente creado correctamente";
-      responseObj.result = newCustomer;
-      res.status(201).json(responseObj);
+      const customers = await getAllCustomersRepository(sortBy, sortDirection, searchTerm);
+      res.status(200).json({
+        status: 200,
+        message: "Clientes obtenidos correctamente",
+        result: customers,
+      });
     } catch (error) {
-      responseObj.status = 500;
-      responseObj.message = "Error al crear cliente";
-      responseObj.result = error.message || "Error desconocido";
-      res.status(500).json(responseObj);
+      console.error("Error al obtener clientes:", error);
+      res.status(500).json({
+        status: 500,
+        message: "Error al obtener clientes",
+      });
     }
   };
   
@@ -198,9 +188,9 @@ import {
   };
   
   export default {
-    getAllCustomersController,
-    getCustomerByIdController,
+    // getAllCustomersController,
     createCustomerController,
     updateCustomerController,
     deleteCustomerController,
+    getCustomers
   };
