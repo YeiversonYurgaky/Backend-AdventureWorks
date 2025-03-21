@@ -23,7 +23,9 @@ export const getAllCustomersRepository = async (
     sql.query(connectionString, query, params, (err, rows) => {
       if (err) {
         console.error("❌ Error al obtener clientes:", err);
-        return reject(new Error("Error al obtener clientes de la base de datos"));
+        return reject(
+          new Error("Error al obtener clientes de la base de datos")
+        );
       }
       resolve(rows);
     });
