@@ -8,10 +8,14 @@ const getAllSalesOrderHeaderController = async (req, res) => {
   let responseObj = { ...Response };
 
   try {
-    const SalesOrderHeader = await getAllSalesOrderHeaderRepository();
+    // Obtenemos el customerId del query param si existe
+    const customerId = req.query.customerId || null;
+    const SalesOrderHeader = await getAllSalesOrderHeaderRepository(customerId);
 
     responseObj.status = 200;
-    responseObj.message = "Pedidos obtenidos correctamente";
+    responseObj.message = customerId 
+      ? `Pedidos del cliente ${customerId} obtenidos correctamente`
+      : "Todos los pedidos obtenidos correctamente";
     responseObj.result = SalesOrderHeader;
 
     res.status(200).json(responseObj);
@@ -26,7 +30,7 @@ const getAllSalesOrderHeaderController = async (req, res) => {
 
 const deleteSalesOrderHeaderController = async (req, res) => {
   const { id } = req.params;
-  let responseObj = { ...Response }; // Copia local para evitar problemas de concurrencia
+  let responseObj = { ...Response };
 
   if (!id) {
     responseObj.status = 400;
@@ -53,3 +57,4 @@ export default {
   getAllSalesOrderHeaderController,
   deleteSalesOrderHeaderController,
 };
+
