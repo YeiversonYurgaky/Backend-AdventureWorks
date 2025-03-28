@@ -1,11 +1,26 @@
 import sql from "msnodesqlv8";
 import { connectionString } from "../config/db.js";
 
-export const getAllSalesOrderHeaderRepository = async () => {
+export const getAllSalesOrderHeaderRepository = async (customerId = null) => {
   return new Promise((resolve, reject) => {
-    const query = "SELECT * FROM SalesLT.SalesOrderHeader";
+    let query = `
+      SELECT 
+        soh.*, 
+        c.NameStyle, 
+        c.LastName
+      FROM SalesLT.SalesOrderHeader soh
+      JOIN SalesLT.Customer c ON soh.CustomerID = c.CustomerID
+    `;
 
-    sql.query(connectionString, query, (err, rows) => {
+    const params = [];
+
+    // Filtro por CustomerID si se proporciona
+    if (customerId) {
+      query += ` WHERE soh.CustomerID = ?`;
+      params.push(customerId);
+    }
+
+    sql.query(connectionString, query, params, (err, rows) => {
       if (err) {
         console.error("❌ Error al obtener pedido de venta:", err);
         return reject(
