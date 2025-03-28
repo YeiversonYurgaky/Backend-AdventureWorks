@@ -2,6 +2,7 @@ import {
   createCustomerRepository,
   deleteCustomerRepository,
   getAllCustomersRepository,
+  getTopCustomersRepository,
   updateCustomerRepository,
 } from "../repository/customer.repository.js";
 import { Response } from "../utils/response.js";
@@ -173,10 +174,28 @@ const deleteCustomerController = async (req, res) => {
   }
 };
 
+const getTopCustomers = async (req, res) => {
+  try {
+    const customers = await getTopCustomersRepository();
+    res.status(200).json({
+      status: 200,
+      message: "Clientes con mayor volumen de compra obtenidos correctamente",
+      result: customers,
+    });
+  } catch (error) {
+    console.error("❌ Error al obtener clientes con mayor volumen de compra:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Error al obtener clientes con mayor volumen de compra",
+    });
+  }
+};
+
 export default {
   // getAllCustomersController,
   createCustomerController,
   updateCustomerController,
   deleteCustomerController,
   getCustomers,
+  getTopCustomers,
 };

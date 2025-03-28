@@ -221,3 +221,29 @@ export const deleteCustomerRepository = async (id) => {
     });
   });
 };
+
+//Clientes con Mayor Volumen de Compra:
+export const getTopCustomersRepository = async () => {
+  const query = `
+    SELECT 
+      c.CustomerID,
+      CONCAT(c.FirstName, ' ', c.LastName) AS CustomerName,
+      COUNT(soh.SalesOrderID) AS TotalOrders,
+      SUM(soh.TotalDue) AS TotalSpent
+    FROM SalesLT.Customer c
+    JOIN SalesLT.SalesOrderHeader soh ON c.CustomerID = soh.CustomerID
+    GROUP BY c.CustomerID, CustomerName
+    ORDER BY TotalSpent DESC;
+  `;
+
+  return new Promise((resolve, reject) => {
+    sql.query(connectionString, query, (err, rows) => {
+      if (err) {
+        console.error("❌ Error al obtener los clientes con mayor volumen de compra:", err);
+        return reject(new Error("Error al obtener los datos de los clientes"));
+      }
+      resolve(rows);
+    });
+  });
+};
+
