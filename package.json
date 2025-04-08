@@ -4,7 +4,11 @@
   "main": "index.js",
   "scripts": {
     "run": "node src/index.js",
-    "dev": "node --watch src/index.js"
+    "dev": "node --watch src/index.js",
+    "test": "jest --config jest.config.js --coverage"
+  },
+  "jest": {
+    "testEnvironment": "node"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +20,10 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "msnodesqlv8": "^4.5.0"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.26.9",
+    "babel-jest": "^29.7.0",
+    "supertest": "^7.1.0"
   }
 }
