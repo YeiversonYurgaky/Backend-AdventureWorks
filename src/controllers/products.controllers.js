@@ -124,19 +124,6 @@ const updateProductController = async (req, res) => {
   let responseObj = { ...Response };
   id = parseInt(id, 10);
   // 🔍 Imprime los datos recibidos
-  console.log("📥 Datos recibidos en el controlador:");
-  console.log({
-    id,
-    Name,
-    ProductNumber,
-    Color,
-    StandardCost,
-    ListPrice,
-    Size,
-    Weight,
-    ProductCategoryID,
-    ProductModelID,
-  });
 
   if (!id || !Name || !ProductNumber) {
     responseObj.status = 400;
