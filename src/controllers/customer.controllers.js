@@ -152,7 +152,7 @@ const deleteCustomerController = async (req, res) => {
   const { id } = req.params;
   let responseObj = { ...Response };
 
-  if (!id) {
+  if (!id || id === 'null' || id === 'undefined') {
     responseObj.status = 400;
     responseObj.message = "Falta el ID del cliente";
     responseObj.result = "El ID es obligatorio";
