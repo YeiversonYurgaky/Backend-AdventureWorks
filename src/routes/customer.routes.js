@@ -4,6 +4,7 @@ import customerController from "../controllers/customer.controllers.js";
 const api = express.Router();
 
 api.get("/customers", customerController.getCustomers);
+api.get("/top-customers", customerController.getTopCustomers);
 api.post("/customers", customerController.createCustomerController);
 api.put("/customers/:id", customerController.updateCustomerController);
 api.delete("/customers/:id", customerController.deleteCustomerController);

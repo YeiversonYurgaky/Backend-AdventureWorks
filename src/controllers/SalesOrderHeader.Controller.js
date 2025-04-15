@@ -1,6 +1,10 @@
 import {
   deleteSalesOrderHeaderRepository,
   getAllSalesOrderHeaderRepository,
+  getAvgShippingTimeRepository,
+  getMonthlySalesReport,
+  getSalesByCategory,
+  getTopSalesMonthRepository,
 } from "../repository/SalesOrderHeader.repository.js";
 import { Response } from "../utils/response.js";
 
@@ -53,8 +57,80 @@ const deleteSalesOrderHeaderController = async (req, res) => {
   }
 };
 
+const getMonthlySales = async (req, res) => {
+  let responseObj = { ...Response };
+  try {
+    const data = await getMonthlySalesReport();
+    responseObj.status = 200;
+    responseObj.message = "Reporte mensual de ventas obtenido correctamente";
+    responseObj.result = data;
+    res.status(200).json(responseObj);
+  } catch (error) {
+    console.error("Error al obtener reporte mensual:", error);
+    responseObj.status = 500;
+    responseObj.message = "Error al obtener reporte mensual de ventas";
+    responseObj.result = error.message;
+    res.status(500).json(responseObj);
+  }
+};
+
+const getSalesByProductCategory = async (req, res) => {
+  let responseObj = { ...Response };
+  try {
+    const data = await getSalesByCategory();
+    responseObj.status = 200;
+    responseObj.message = "Ventas por categoría obtenidas correctamente";
+    responseObj.result = data;
+    res.status(200).json(responseObj);
+  } catch (error) {
+    console.error("Error al obtener ventas por categoría:", error);
+    responseObj.status = 500;
+    responseObj.message = "Error al obtener ventas por categoría";
+    responseObj.result = error.message;
+    res.status(500).json(responseObj);
+  }
+};
+
+const getAvgShippingTime = async (req, res) => {
+  try {
+    const result = await getAvgShippingTimeRepository();
+    res.status(200).json({
+      status: 200,
+      message: "Tiempo promedio de envío obtenido correctamente",
+      result: result.AvgShippingDays,
+    });
+  } catch (error) {
+    console.error("❌ Error al obtener el tiempo promedio de envío:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Error al calcular el tiempo promedio de envío",
+    });
+  }
+};
+
+const getTopSalesMonth = async (req, res) => {
+  try {
+    const result = await getTopSalesMonthRepository();
+    res.status(200).json({
+      status: 200,
+      message: "Mes con más ventas obtenido correctamente",
+      result: result,
+    });
+  } catch (error) {
+    console.error("❌ Error al obtener el mes con más ventas:", error);
+    res.status(500).json({
+      status: 500,
+      message: "Error al calcular el mes con más ventas",
+    });
+  }
+};
+
 export default {
   getAllSalesOrderHeaderController,
   deleteSalesOrderHeaderController,
+  getMonthlySales,
+  getSalesByProductCategory,
+  getAvgShippingTime,
+  getTopSalesMonth,
 };
 

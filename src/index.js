@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import customersRoutes from "./routes/customer.routes.js";
 import productsRoutes from "./routes/products.routes.js";
 import SalesOrderHeader from "./routes/SalesOrderHeader.routes.js";
+import SalesOrderDetail from "./routes/SalesOrderDetail.routes.js";
 
 dotenv.config();
 const app = express();
@@ -21,6 +22,7 @@ app.use(cors());
 app.use("/api", productsRoutes);
 app.use("/api", customersRoutes);
 app.use("/api", SalesOrderHeader);
+app.use("/api", SalesOrderDetail);
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
