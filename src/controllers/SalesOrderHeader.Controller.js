@@ -6,6 +6,7 @@ import {
   getSalesByCategory,
   getTopSalesMonthRepository,
 } from "../repository/SalesOrderHeader.repository.js";
+import { generarOrdenesDePrueba } from "../utils/generarOrdenesDePrueba.js";
 import { Response } from "../utils/response.js";
 
 const getAllSalesOrderHeaderController = async (req, res) => {
@@ -125,6 +126,17 @@ const getTopSalesMonth = async (req, res) => {
   }
 };
 
+const insertarOrdenesDePrueba = async (req, res) => {
+  try {
+    const ordenes = generarOrdenesDePrueba();
+    await insertTestOrders(ordenes);
+    res.status(200).json({ message: 'Órdenes de prueba insertadas correctamente.' });
+  } catch (error) {
+    console.error('❌ Error al insertar órdenes de prueba:', error);
+    res.status(500).json({ error: 'Error al insertar órdenes de prueba.' });
+  }
+};
+
 export default {
   getAllSalesOrderHeaderController,
   deleteSalesOrderHeaderController,
@@ -132,5 +144,6 @@ export default {
   getSalesByProductCategory,
   getAvgShippingTime,
   getTopSalesMonth,
+  insertarOrdenesDePrueba,
 };
 

@@ -50,6 +50,60 @@ export const deleteSalesOrderHeaderRepository = async (id) => {
     });
   });
 };
+
+//Inyectar Datos
+export const insertTestOrders = async (orders) => {
+  for (const order of orders) {
+    // Insertar en SalesOrderHeader
+    await new Promise((resolve, reject) => {
+      const query = `
+        INSERT INTO SalesLT.SalesOrderHeader (
+          SalesOrderID, RevisionNumber, OrderDate, DueDate, ShipDate, Status, OnlineOrderFlag,
+          SalesOrderNumber, PurchaseOrderNumber, AccountNumber, CustomerID, ShipToAddressID, BillToAddressID,
+          ShipMethod, SubTotal, TaxAmt, Freight, TotalDue, Comment, rowguid, ModifiedDate
+        )
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `;
+
+      const params = [
+        order.SalesOrderID, order.RevisionNumber, order.OrderDate, order.DueDate, order.ShipDate,
+        order.Status, order.OnlineOrderFlag, order.SalesOrderNumber, order.PurchaseOrderNumber,
+        order.AccountNumber, order.CustomerID, order.ShipToAddressID, order.BillToAddressID,
+        order.ShipMethod, order.SubTotal, order.TaxAmt, order.Freight, order.TotalDue,
+        order.Comment, order.rowguid, order.ModifiedDate
+      ];
+
+      sql.query(connectionString, query, params, (err, result) => {
+        if (err) return reject(err);
+        resolve(result);
+      });
+    });
+
+    // Insertar detalles en SalesOrderDetail
+    for (const detail of order.details) {
+      await new Promise((resolve, reject) => {
+        const detailQuery = `
+          INSERT INTO SalesLT.SalesOrderDetail (
+            SalesOrderID, SalesOrderDetailID, OrderQty, ProductID,
+            UnitPrice, UnitPriceDiscount, LineTotal, rowguid, ModifiedDate
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const detailParams = [
+          detail.SalesOrderID, detail.SalesOrderDetailID, detail.OrderQty,
+          detail.ProductID, detail.UnitPrice, detail.UnitPriceDiscount,
+          detail.LineTotal, detail.rowguid, detail.ModifiedDate
+        ];
+
+        sql.query(connectionString, detailQuery, detailParams, (err, result) => {
+          if (err) return reject(err);
+          resolve(result);
+        });
+      });
+    }
+  }
+};
+
 //Ventas Totales por Año y Mes:
 export const getMonthlySalesReport = async () => {
   const query = `
