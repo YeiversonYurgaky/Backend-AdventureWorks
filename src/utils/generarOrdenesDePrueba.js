@@ -1,21 +1,16 @@
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from "uuid";
 
 const productIDs = [
-  980, 771, 977, 818, 748,
-  975, 884, 791, 775, 848,
-  715, 781, 912, 830, 950
+  980, 771, 977, 818, 748, 975, 884, 791, 775, 848, 715, 781, 912, 830, 950,
 ];
 
 const customerIDs = [
-  12, 29784, 451, 29606, 200,
-  29603, 294, 29636, 29780, 29,
-  29567, 128, 29813, 523, 281
+  12, 29784, 451, 29606, 200, 29603, 294, 29636, 29780, 29, 29567, 128, 29813,
+  523, 281,
 ];
 
 const addressIDs = [
-  451, 466, 467, 475, 487,
-  502, 504, 505, 519, 526,
-  546, 553, 558, 28, 1023
+  451, 466, 467, 475, 487, 502, 504, 505, 519, 526, 546, 553, 558, 28, 1023,
 ];
 
 const shipMethod = "CARGO TRANSPORT 5";
@@ -64,7 +59,7 @@ function generarOrdenesDePrueba() {
         UnitPriceDiscount,
         LineTotal,
         rowguid: uuidv4().toUpperCase(),
-        ModifiedDate: new Date()
+        ModifiedDate: new Date(),
       });
     }
 
@@ -94,7 +89,7 @@ function generarOrdenesDePrueba() {
       Comment: null,
       rowguid: uuidv4().toUpperCase(),
       ModifiedDate: new Date(),
-      details
+      details,
     };
 
     ordenes.push(order);
@@ -103,4 +98,4 @@ function generarOrdenesDePrueba() {
   return ordenes;
 }
 
-module.exports = { generarOrdenesDePrueba };
+export { generarOrdenesDePrueba };

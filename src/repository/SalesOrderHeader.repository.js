@@ -66,11 +66,27 @@ export const insertTestOrders = async (orders) => {
       `;
 
       const params = [
-        order.SalesOrderID, order.RevisionNumber, order.OrderDate, order.DueDate, order.ShipDate,
-        order.Status, order.OnlineOrderFlag, order.SalesOrderNumber, order.PurchaseOrderNumber,
-        order.AccountNumber, order.CustomerID, order.ShipToAddressID, order.BillToAddressID,
-        order.ShipMethod, order.SubTotal, order.TaxAmt, order.Freight, order.TotalDue,
-        order.Comment, order.rowguid, order.ModifiedDate
+        order.SalesOrderID,
+        order.RevisionNumber,
+        order.OrderDate,
+        order.DueDate,
+        order.ShipDate,
+        order.Status,
+        order.OnlineOrderFlag,
+        order.SalesOrderNumber,
+        order.PurchaseOrderNumber,
+        order.AccountNumber,
+        order.CustomerID,
+        order.ShipToAddressID,
+        order.BillToAddressID,
+        order.ShipMethod,
+        order.SubTotal,
+        order.TaxAmt,
+        order.Freight,
+        order.TotalDue,
+        order.Comment,
+        order.rowguid,
+        order.ModifiedDate,
       ];
 
       sql.query(connectionString, query, params, (err, result) => {
@@ -90,15 +106,26 @@ export const insertTestOrders = async (orders) => {
         `;
 
         const detailParams = [
-          detail.SalesOrderID, detail.SalesOrderDetailID, detail.OrderQty,
-          detail.ProductID, detail.UnitPrice, detail.UnitPriceDiscount,
-          detail.LineTotal, detail.rowguid, detail.ModifiedDate
+          detail.SalesOrderID,
+          detail.SalesOrderDetailID,
+          detail.OrderQty,
+          detail.ProductID,
+          detail.UnitPrice,
+          detail.UnitPriceDiscount,
+          detail.LineTotal,
+          detail.rowguid,
+          detail.ModifiedDate,
         ];
 
-        sql.query(connectionString, detailQuery, detailParams, (err, result) => {
-          if (err) return reject(err);
-          resolve(result);
-        });
+        sql.query(
+          connectionString,
+          detailQuery,
+          detailParams,
+          (err, result) => {
+            if (err) return reject(err);
+            resolve(result);
+          }
+        );
       });
     }
   }
@@ -115,7 +142,7 @@ export const getMonthlySalesReport = async () => {
       SUM(SubTotal) AS SubTotalSales,
       SUM(TaxAmt) AS TotalTax,
       SUM(Freight) AS TotalFreight
-    FROM SalesOrderHeader
+    FROM SalesLT.SalesOrderHeader
     GROUP BY YEAR(OrderDate), MONTH(OrderDate)
     ORDER BY Year, Month;
   `;
@@ -139,10 +166,10 @@ export const getSalesByCategory = async () => {
       COUNT(DISTINCT soh.SalesOrderID) AS TotalOrders,
       SUM(sod.OrderQty) AS TotalQuantitySold,
       SUM(soh.TotalDue) AS TotalSales
-    FROM SalesOrderHeader soh
-    JOIN SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID
-    JOIN Product p ON sod.ProductID = p.ProductID
-    JOIN ProductCategory pc ON p.ProductCategoryID = pc.ProductCategoryID
+    FROM SalesLT.SalesOrderHeader soh
+    JOIN SalesLT.SalesOrderDetail sod ON soh.SalesOrderID = sod.SalesOrderID
+    JOIN SalesLT.Product p ON sod.ProductID = p.ProductID
+    JOIN SalesLT.ProductCategory pc ON p.ProductCategoryID = pc.ProductCategoryID
     GROUP BY pc.Name
     ORDER BY TotalSales DESC;
   `;
@@ -181,15 +208,14 @@ export const getAvgShippingTimeRepository = async () => {
 //Mes con más ventas
 export const getTopSalesMonthRepository = async () => {
   const query = `
-    SELECT 
+    SELECT TOP 1
       YEAR(OrderDate) AS Year,
       MONTH(OrderDate) AS Month,
       COUNT(SalesOrderID) AS TotalOrders,
       SUM(TotalDue) AS TotalSales
     FROM SalesLT.SalesOrderHeader
     GROUP BY YEAR(OrderDate), MONTH(OrderDate)
-    ORDER BY TotalSales DESC
-    LIMIT 1;
+    ORDER BY TotalSales DESC;
   `;
 
   return new Promise((resolve, reject) => {
@@ -202,4 +228,3 @@ export const getTopSalesMonthRepository = async () => {
     });
   });
 };
-

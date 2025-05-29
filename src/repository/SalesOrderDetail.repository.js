@@ -4,15 +4,14 @@ import { connectionString } from "../config/db.js";
 //Top 10 Productos Más Vendidos por Cantidad:
 export const getTopSellingProducts = async () => {
   const query = `
-    SELECT 
+    SELECT TOP 10
       p.Name AS ProductName,
       SUM(sod.OrderQty) AS TotalQuantity,
       SUM(sod.LineTotal) AS TotalRevenue
-    FROM SalesOrderDetail sod
-    JOIN Product p ON sod.ProductID = p.ProductID
+    FROM SalesLT.SalesOrderDetail sod
+    JOIN SalesLT.Product p ON sod.ProductID = p.ProductID
     GROUP BY p.Name
-    ORDER BY TotalRevenue DESC
-    LIMIT 10;
+    ORDER BY TotalRevenue DESC;
   `;
 
   return new Promise((resolve, reject) => {
